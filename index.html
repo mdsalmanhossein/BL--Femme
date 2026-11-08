@@ -5,11 +5,12 @@
 <title>Spin Wheel</title>
 <style>
   body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #111; color: #fff; font-family: Arial, sans-serif; }
-  #wheel-container { position: relative; width: 350px; height: 350px; }
-  #wheel { width: 100%; height: 100%; border-radius: 50%; border: 12px solid #d4af37; box-sizing: border-box; transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99); position: relative; overflow: hidden; }
-  .slice { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; box-sizing: border-box; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: #fff; text-shadow: 1px 1px 2px #000; }
+  #wheel-container { position: relative; width: 400px; height: 400px; }
+  #wheel { width: 100%; height: 100%; border-radius: 50%; border: 10px solid #d4af37; box-sizing: border-box; position: relative; overflow: hidden; transition: transform 5s cubic-bezier(0.1, 0.7, 0.1, 1); }
+  .slice { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; box-sizing: border-box; border: 1px solid #fff; display: flex; align-items: center; justify-content: flex-start; }
+  .slice-text { position: absolute; left: 60px; top: 50%; transform: translateY(-50%) rotate(90deg); font-weight: bold; font-size: 14px; color: #000; width: 120px; text-align: center; background: rgba(255,255,255,0.8); padding: 4px; border-radius: 4px; white-space: nowrap; }
   #pin { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid red; z-index: 10; }
-  button { margin-top: 30px; padding: 15px 40px; font-size: 18px; font-weight: bold; color: #111; background-color: #d4af37; border: none; border-radius: 5px; cursor: pointer; }
+  button { margin-top: 40px; padding: 15px 40px; font-size: 20px; font-weight: bold; color: #fff; background-color: #d4af37; border: none; border-radius: 5px; cursor: pointer; }
   button:disabled { background-color: #555; cursor: not-allowed; }
 </style>
 </head>
@@ -23,36 +24,32 @@
 
 <script>
 const items = [
-  { text: "Item 1", color: "#FF5733" },
-  { text: "Item 2", color: "#33FF57" },
-  { text: "Item 3", color: "#3357FF" },
-  { text: "Item 4", color: "#F333FF" },
-  { text: "Item 5", color: "#FF33A8" },
-  { text: "Item 6", color: "#33FFF5" },
-  { text: "Item 7", color: "#F5FF33" },
-  { text: "Item 8", color: "#FF8C33" },
-  { text: "Item 9", color: "#8C33FF" },
-  { text: "Item 10", color: "#33FF8C" },
-  { text: "Item 11", color: "#FF3333" },
-  { text: "Item 12", color: "#3333FF" }
+  "Discount 10%", "Gift Card", "Try Again", "Free Shipping",
+  "Product A", "Discount 20%", "Jackpot", "Product B",
+  "Cashback", "Mystery Box", "Discount 50%", "Voucher"
 ];
+const colors = ["#FF5733", "#33FF57", "#3357FF", "#F333FF", "#FF33A8", "#33FFF5", "#F5FF33", "#FF8C33", "#8C33FF", "#33FF8C", "#FF3333", "#3333FF"];
 
 const wheel = document.getElementById('wheel');
 const spinBtn = document.getElementById('spin-btn');
 const sliceAngle = 360 / items.length;
 
-if (localStorage.getItem('spun')) {
+if (localStorage.getItem('spun') === 'true') {
   spinBtn.disabled = true;
-  spinBtn.innerText = "Already Spun";
+  spinBtn.innerText = "Locked";
 }
 
 items.forEach((item, index) => {
   const slice = document.createElement('div');
   slice.className = 'slice';
-  slice.style.backgroundColor = item.color;
+  slice.style.backgroundColor = colors[index % colors.length];
   slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-${90 - sliceAngle}deg)`;
-  slice.innerHTML = `<span style="transform: skewY(${90 - sliceAngle}deg) rotate(${sliceAngle/2}deg);">${item.text}</span>`;
-  slice.id = `slice-${index}`;
+  
+  const textDiv = document.createElement('div');
+  textDiv.className = 'slice-text';
+  textDiv.innerText = item;
+  slice.appendChild(textDiv);
+  
   wheel.appendChild(slice);
 });
 
@@ -68,8 +65,6 @@ function spinWheel() {
   
   setTimeout(() => {
     localStorage.setItem('spun', 'true');
-    const winningSlice = document.getElementById(`slice-${winningIndex}`);
-    if(winningSlice) winningSlice.style.backgroundColor = 'gold';
     spinBtn.innerText = "Locked";
   }, 5000);
 }
