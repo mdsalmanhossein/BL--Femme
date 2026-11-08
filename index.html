@@ -1,26 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
+<meta charset="UTF-8">
+<title>Spin Wheel</title>
 <style>
-body { display: flex; flex-direction: column; align-items: center; font-family: sans-serif; background: #1a1a1a; color: white; }
-#wheel { width: 300px; height: 300px; border-radius: 50%; border: 10px solid gold; position: relative; overflow: hidden; transition: transform 4s ease-out; }
-.slice { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; box-sizing: border-box; border: 1px solid #000; text-align: center; }
-button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #111; color: #fff; font-family: Arial, sans-serif; }
+  #wheel-container { position: relative; width: 350px; height: 350px; }
+  #wheel { width: 100%; height: 100%; border-radius: 50%; border: 12px solid #d4af37; box-sizing: border-box; transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99); position: relative; overflow: hidden; }
+  .slice { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; box-sizing: border-box; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: #fff; text-shadow: 1px 1px 2px #000; }
+  #pin { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid red; z-index: 10; }
+  button { margin-top: 30px; padding: 15px 40px; font-size: 18px; font-weight: bold; color: #111; background-color: #d4af37; border: none; border-radius: 5px; cursor: pointer; }
+  button:disabled { background-color: #555; cursor: not-allowed; }
 </style>
 </head>
 <body>
-<div id="wheel">
-  <div class="slice" style="transform: rotate(0deg); background: red;">Win 1</div>
-  <div class="slice" style="transform: rotate(90deg); background: blue;">Win 2</div>
-  <div class="slice" style="transform: rotate(180deg); background: green;">Win 3</div>
-  <div class="slice" style="transform: rotate(270deg); background: orange;">Win 4</div>
+
+<div id="pin"></div>
+<div id="wheel-container">
+  <div id="wheel"></div>
 </div>
-<button onclick="spin()">Spin</button>
+<button id="spin-btn" onclick="spinWheel()">SPIN</button>
+
 <script>
-let degree = 0;
-function spin() {
-  degree += 1080 + Math.floor(Math.random() * 360);
-  document.getElementById('wheel').style.transform = `rotate(${degree}deg)`;
+const items = [
+  { text: "Item 1", color: "#FF5733" },
+  { text: "Item 2", color: "#33FF57" },
+  { text: "Item 3", color: "#3357FF" },
+  { text: "Item 4", color: "#F333FF" },
+  { text: "Item 5", color: "#FF33A8" },
+  { text: "Item 6", color: "#33FFF5" },
+  { text: "Item 7", color: "#F5FF33" },
+  { text: "Item 8", color: "#FF8C33" },
+  { text: "Item 9", color: "#8C33FF" },
+  { text: "Item 10", color: "#33FF8C" },
+  { text: "Item 11", color: "#FF3333" },
+  { text: "Item 12", color: "#3333FF" }
+];
+
+const wheel = document.getElementById('wheel');
+const spinBtn = document.getElementById('spin-btn');
+const sliceAngle = 360 / items.length;
+
+if (localStorage.getItem('spun')) {
+  spinBtn.disabled = true;
+  spinBtn.innerText = "Already Spun";
+}
+
+items.forEach((item, index) => {
+  const slice = document.createElement('div');
+  slice.className = 'slice';
+  slice.style.backgroundColor = item.color;
+  slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-${90 - sliceAngle}deg)`;
+  slice.innerHTML = `<span style="transform: skewY(${90 - sliceAngle}deg) rotate(${sliceAngle/2}deg);">${item.text}</span>`;
+  slice.id = `slice-${index}`;
+  wheel.appendChild(slice);
+});
+
+let currentRotation = 0;
+function spinWheel() {
+  spinBtn.disabled = true;
+  const winningIndex = Math.floor(Math.random() * items.length);
+  const degreesPerSlice = 360 / items.length;
+  const targetDegree = (items.length - 1 - winningIndex) * degreesPerSlice + (degreesPerSlice / 2);
+  currentRotation += 360 * 5 + targetDegree;
+  
+  wheel.style.transform = `rotate(${currentRotation}deg)`;
+  
+  setTimeout(() => {
+    localStorage.setItem('spun', 'true');
+    const winningSlice = document.getElementById(`slice-${winningIndex}`);
+    if(winningSlice) winningSlice.style.backgroundColor = 'gold';
+    spinBtn.innerText = "Locked";
+  }, 5000);
 }
 </script>
 </body>
