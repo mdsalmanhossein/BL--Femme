@@ -2,24 +2,58 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<title>Spin Wheel</title>
+<title>BL FEMME Spin Wheel</title>
 <style>
-  body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #111; color: #fff; font-family: Arial, sans-serif; }
+  body { 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    min-height: 100vh; margin: 0; background-color: #0A0A0A; color: #D4AF37; 
+    font-family: 'Arial', sans-serif; 
+  }
+  h1 { margin-bottom: 10px; letter-spacing: 3px; text-shadow: 0 0 10px #D4AF37; }
+  #warning { margin-bottom: 20px; color: #ff3333; font-weight: bold; }
   #wheel-container { position: relative; width: 400px; height: 400px; }
-  #wheel { width: 100%; height: 100%; border-radius: 50%; border: 10px solid #d4af37; box-sizing: border-box; position: relative; overflow: hidden; transition: transform 5s cubic-bezier(0.1, 0.7, 0.1, 1); }
-  .slice { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; box-sizing: border-box; border: 1px solid #fff; display: flex; align-items: center; justify-content: flex-start; }
-  .slice-text { position: absolute; left: 40px; top: 50%; transform: translateY(-50%) rotate(90deg); font-weight: bold; font-size: 12px; color: #000; width: 140px; text-align: center; background: rgba(255,255,255,0.9); padding: 4px; border-radius: 4px; white-space: nowrap; }
-  #pin { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid red; z-index: 10; }
-  button { margin-top: 40px; padding: 15px 40px; font-size: 20px; font-weight: bold; color: #fff; background-color: #d4af37; border: none; border-radius: 5px; cursor: pointer; }
+  #wheel { 
+    width: 100%; height: 100%; border-radius: 50%; border: 12px solid #D4AF37; 
+    box-sizing: border-box; position: relative; overflow: hidden; 
+    transition: transform 5s cubic-bezier(0.1, 0.7, 0.1, 1);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  }
+  .slice { 
+    position: absolute; width: 50%; height: 50%; top: 0; left: 50%; 
+    transform-origin: 0% 100%; box-sizing: border-box; 
+    border: 1px solid #D4AF37; display: flex; align-items: center; justify-content: flex-start; 
+  }
+  .slice-text { 
+    position: absolute; left: 30px; top: 50%; transform: translateY(-50%) rotate(90deg); 
+    font-weight: bold; font-size: 12px; color: #D4AF37; width: 150px; text-align: center; 
+    background: rgba(0,0,0,0.8); padding: 5px; border-radius: 4px; white-space: nowrap;
+    border: 1px solid #D4AF37;
+  }
+  #pin { 
+    position: absolute; top: -25px; left: 50%; transform: translateX(-50%); 
+    width: 0; height: 0; border-left: 25px solid transparent; 
+    border-right: 25px solid transparent; border-top: 50px solid #D4AF37; 
+    z-index: 10; filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.8));
+  }
+  button { 
+    margin-top: 40px; padding: 15px 50px; font-size: 22px; font-weight: bold; 
+    color: #0A0A0A; background-color: #D4AF37; border: none; border-radius: 50px; 
+    cursor: pointer; box-shadow: 0 0 15px #D4AF37; transition: 0.3px;
+  }
+  button:hover { background-color: #fff; transform: scale(1.05); }
+  button:disabled { background-color: #333; color: #666; box-shadow: none; cursor: not-allowed; }
 </style>
 </head>
 <body>
+
+<h1>BL FEMME</h1>
+<div id="warning">⚠️ সতর্কবার্তা: আপনি শুধুমাত্র একবারই স্পিন করতে পারবেন!</div>
 
 <div id="pin"></div>
 <div id="wheel-container">
   <div id="wheel"></div>
 </div>
-<button id="spin-btn" onclick="checkSpin()">SPIN</button>
+<button id="spin-btn" onclick="spinWheel()">SPIN</button>
 
 <script>
 const items = [
@@ -27,15 +61,22 @@ const items = [
   "Product A", "Discount 20%", "Jackpot", "Product B",
   "Cashback", "Mystery Box", "Discount 50%", "Voucher"
 ];
-const colors = ["#FF5733", "#33FF57", "#3357FF", "#F333FF", "#FF33A8", "#33FFF5", "#F5FF33", "#FF8C33", "#8C33FF", "#33FF8C", "#FF3333", "#3333FF"];
 
 const wheel = document.getElementById('wheel');
+const spinBtn = document.getElementById('spin-btn');
 const sliceAngle = 360 / items.length;
+
+if (localStorage.getItem('alreadySpun') === 'true') {
+  spinBtn.disabled = true;
+  spinBtn.innerText = "Locked";
+  document.getElementById('warning').innerText = "❌ আপনি ইতিমধ্যে একবার স্পিন করেছেন!";
+}
 
 items.forEach((item, index) => {
   const slice = document.createElement('div');
   slice.className = 'slice';
-  slice.style.backgroundColor = colors[index % colors.length];
+  // Alternating black and dark gold background for slices
+  slice.style.backgroundColor = index % 2 === 0 ? "#1A1A1A" : "#2A2A10";
   slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-${90 - sliceAngle}deg)`;
   
   const textDiv = document.createElement('div');
@@ -47,25 +88,7 @@ items.forEach((item, index) => {
 });
 
 let currentRotation = 0;
-function checkSpin() {
-  const lastSpin = localStorage.getItem('lastSpinTime');
-  const now = new Date().getTime();
-  const cooldownPeriod = 72 * 60 * 60 * 1000;
-
-  if (lastSpin && (now - lastSpin < cooldownPeriod)) {
-    const password = prompt("You are in cooldown. Enter Admin Password to re-spin:");
-    if (password === "blrepass") {
-      executeSpin();
-    } else {
-      alert("Invalid password or still in cooldown!");
-    }
-  } else {
-    executeSpin();
-  }
-}
-
-function executeSpin() {
-  const spinBtn = document.getElementById('spin-btn');
+function spinWheel() {
   spinBtn.disabled = true;
   const winningIndex = Math.floor(Math.random() * items.length);
   const degreesPerSlice = 360 / items.length;
@@ -75,9 +98,10 @@ function executeSpin() {
   wheel.style.transform = `rotate(${currentRotation}deg)`;
   
   setTimeout(() => {
-    localStorage.setItem('lastSpinTime', new Date().getTime());
-    spinBtn.disabled = false;
-    alert("You won: " + items[winningIndex]);
+    localStorage.setItem('alreadySpun', 'true');
+    alert(" congratulations! You won: " + items[winningIndex]);
+    spinBtn.innerText = "Locked";
+    document.getElementById('warning').innerText = "❌ আপনি ইতিমধ্যে একবার স্পিন করেছেন!";
   }, 5000);
 }
 </script>
