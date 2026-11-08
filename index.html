@@ -1,23 +1,27 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>BL FEMME</title>
-    <style>
-        body {
-            background-color: #0d0d0d;
-            color: #d4af37;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            padding-top: 200px;
-        }
-        h1 {
-            font-size: 50px;
-            letter-spacing: 5px;
-        }
-    </style>
+<style>
+body { display: flex; flex-direction: column; align-items: center; font-family: sans-serif; background: #1a1a1a; color: white; }
+#wheel { width: 300px; height: 300px; border-radius: 50%; border: 10px solid gold; position: relative; overflow: hidden; transition: transform 4s ease-out; }
+.slice { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; box-sizing: border-box; border: 1px solid #000; text-align: center; }
+button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+</style>
 </head>
 <body>
-    <h1>BL FEMME</h1>
+<div id="wheel">
+  <div class="slice" style="transform: rotate(0deg); background: red;">Win 1</div>
+  <div class="slice" style="transform: rotate(90deg); background: blue;">Win 2</div>
+  <div class="slice" style="transform: rotate(180deg); background: green;">Win 3</div>
+  <div class="slice" style="transform: rotate(270deg); background: orange;">Win 4</div>
+</div>
+<button onclick="spin()">Spin</button>
+<script>
+let degree = 0;
+function spin() {
+  degree += 1080 + Math.floor(Math.random() * 360);
+  document.getElementById('wheel').style.transform = `rotate(${degree}deg)`;
+}
+</script>
 </body>
 </html>
