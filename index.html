@@ -65,20 +65,25 @@ const items = [
 const wheel = document.getElementById('wheel');
 const sliceAngle = 360 / items.length;
 
-items.forEach((item, index) => {
-  const slice = document.createElement('div');
-  slice.className = 'slice';
-  slice.style.backgroundColor = index % 2 === 0 ? "#141414" : "#24240C";
-  slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-${90 - sliceAngle}deg)`;
-  
-  const textDiv = document.createElement('div');
-  textDiv.className = 'slice-text';
-  textDiv.innerText = item;
-  slice.appendChild(textDiv);
-  
-  slice.id = `slice-${index}`;
-  wheel.appendChild(slice);
-});
+function renderWheel() {
+  wheel.innerHTML = '';
+  items.forEach((item, index) => {
+    const slice = document.createElement('div');
+    slice.className = 'slice';
+    slice.style.backgroundColor = index % 2 === 0 ? "#141414" : "#24240C";
+    slice.style.transform = `rotate(${index * sliceAngle}deg) skewY(-${90 - sliceAngle}deg)`;
+    
+    const textDiv = document.createElement('div');
+    textDiv.className = 'slice-text';
+    textDiv.innerText = item;
+    slice.appendChild(textDiv);
+    
+    slice.id = `slice-${index}`;
+    wheel.appendChild(slice);
+  });
+}
+
+renderWheel();
 
 function checkSpin() {
   const hasSpun = localStorage.getItem('spun_blfemme');
@@ -88,7 +93,7 @@ function checkSpin() {
     if (password === "blrepass") {
        executeSpin();
     } else {
-       alert("!");
+       alert("❌ ভুল পাসওয়ার্ড!");
     }
   } else {
     executeSpin();
